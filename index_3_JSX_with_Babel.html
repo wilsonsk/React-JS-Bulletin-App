@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+        <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+        <title>My First React File</title>
+    </head>
+    <body>
+        <div id="react-container"></div>
+        <!-- this script contains all react content -->
+        <script type="text/babel">
+            //ReactDOM.render(): takes 2 args- 1st what we want to create; 2nd where we want to place the creation
+            //React.createElement(): takes 3 args- 1st type of element; 2nd properties; 3rd content
+            //'react-container': ID we created
+            ReactDOM.render(
+                <ul>
+                    <li>item 1</li>
+                    <li>item 2</li>
+                    <li>item 3</li>
+                </ul>,
+                document.getElementById('react-container'))
+        </script>
+    </body>
+</html>
+
+
+<!-- JSX: javascript as XML -->
+<!-- error at first < tag -->
+<!-- error corrected via babel: transpiles (compiles) JS code (JSX, ES6 and beyond) -- which takes JSX and turns it in to createElement calls so browser can read easily 
+
+    ex: <div>Hello World</div> >>> React.createElement('div', null, 'Hello World');
+
+-->
