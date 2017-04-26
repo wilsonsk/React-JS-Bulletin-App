@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+        <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+        <title>My First React File</title>
+    </head>
+    <body>
+        <div id="react-container"></div>
+        <!-- this script contains all react content -->
+        <script type="text/babel">
+            var MyComponent = React.createClass({
+                //render is always required when we create a component, because it tells react what we want to render to the DOM 
+
+                //props: component properties -- similar to html attributes
+    
+                //Props: Most components can be customized when they are created, with different parameters. These creation parameters are called props 
+                //sending properties to a component is very similiar to adding properties to HTML 
+                //this.props.text: JSX syntax -- any JSX expression gets wrapped in {} and we reference 'this' on the props object by refering to text attribute in .render()
+                //this makes it extremely useful when dealing with reusable components - if i create this one component, I can use it as many times as i'd like
+                
+                render(){
+                    return <div>
+                        <h1>{this.props.text}</h1>
+                        {/* <p>This is my first React Component</p> */}
+                        <p>{this.props.children}</p>
+                    </div>
+                }
+            })
+            //render() takes 2 args, 1st is component we want to render, 2nd where to render the component
+            ReactDOM.render(<div>
+            {/* besides rendering multiple divs within a component... */}
+            {/* ... anther thing we can do with props is something called .props.children and that's going to helps us display some dynamic content as well */}
+            {/* so we instead of using a self closing tag (which denotes that no children nodes are appended) when rendering components, i can use a closing tag */}
+            {/* the reason is that i can now add tags inside of these components or i can just add some text */}
+            
+                {/* <MyComponent text="Hello World"/> */}
+                {/* <MyComponent text="I am a component"/> */}
+                {/* <MyComponent text="I have been reused"/> */}
+                
+                {/* these are components that are wrapped around some child text */}
+                {/* if i want this child text to display, i can inside the paragraph tag (of my component), i can replace the static content 'this is my first react component' with another JSX expression (ie props.children) */}
+                <MyComponent text="Hello World">
+                This is message 1
+                </MyComponent>
+                <MyComponent text="I am a component">
+                This is message 2
+                </MyComponent>
+                <MyComponent text="I have been reused">
+                This is message 3
+                </MyComponent>
+                </div>,
+                document.getElementById('react-container')
+            )
+        </script>
+    </body>
+</html>
+
+
+<!-- JSX: javascript as XML -->
+<!-- error at first < tag -->
+<!-- error corrected via babel: transpiles (compiles) JSX to JS code (JSX, ES6 and beyond) -- which takes JSX and turns it in to createElement calls so browser can read easily 
+
+    ex: <div>Hello World</div> >>> React.createElement('div', null, 'Hello World');
+
+-->
