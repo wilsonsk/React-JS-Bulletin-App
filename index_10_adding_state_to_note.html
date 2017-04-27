@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+        <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <title>Building the Note Board</title>
+    </head>
+    <body>
+        <div id="react-container"></div>
+        <!-- this script contains all react content -->
+        <script type="text/babel">
+            //create component for Note
+            //in this case we are going to return several different elements -- best practice for working within the render method is to wrap all of the DOM elements that we want to create in ()
+            //the reason for this is that without the (), if the element is on the next line from the 'return' we will get an error, if there are () even with the staggered line arragement, there will be NO error
+            var Note = React.createClass({
+                //in addition to our simple render method, we can create our own methods inside of our components
+                //here we are going to create an edit function 
+                
+                getInitialState(){
+                    return{editing: false}
+                },
+                edit(){
+                      //alert("Editing Note")
+                      this.setState({editing: true})
+                },
+                save(){
+                    this.setState({editing: false})
+                },
+                remove(){
+                    alert("Removing Note")
+                },
+                renderForm(){
+                    return(<div className="note">
+                        <textarea></textarea>
+                        <button onClick={this.save}>SAVE</button>
+                    </div>
+                    )
+                },
+                renderDisplay(){
+                    return (
+                        <div className="note">
+                            <p>{this.props.children}</p>
+                            <span>
+                                {/* the onClick function values are within {} denoting JSX syntax */}
+                                <button onClick={this.edit}>EDIT</button>
+                                <button onClick={this.remove}>X</button>
+                            </span>
+                        </div>
+                    )                    
+                },
+                render(){
+                    {/*if(this.state.editing){
+                        return this.renderForm()
+                    }else{
+                        return this.renderDisplay()
+                    } below is an alternative simplified syntax making it more terse and concise -- an inline if-else statement
+                    This is a pretty popular syntax that you'll see, especially in React documentation. A little bit easier to write, and definitely easier to read, so I just wanted to make a little enhancement there. 
+                    */}
+                    return (this.state.editing) ? this.renderForm(): this.renderDisplay() 
+                }
+            })
+            
+            //render() takes 2 args, 1st is component we want to render, 2nd where to render the component
+            //
+            ReactDOM.render(<div>
+                <Note>
+                Hello World
+                </Note>
+                </div>,
+                document.getElementById('react-container')
+            )
+        </script>
+    </body>
+</html>
+
+
+<!-- JSX: javascript as XML -->
+<!-- error at first < tag -->
+<!-- error corrected via babel: transpiles (compiles) JSX to JS code (JSX, ES6 and beyond) -- which takes JSX and turns it in to createElement calls so browser can read easily 
+
+    ex: <div>Hello World</div> >>> React.createElement('div', null, 'Hello World');
+
+-->

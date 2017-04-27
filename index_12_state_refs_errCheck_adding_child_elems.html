@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+        <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <title>Building the Note Board</title>
+    </head>
+    <body>
+        <div id="react-container"></div>
+        <!-- this script contains all react content -->
+        <script type="text/babel">
+            //create component for Note
+            //in this case we are going to return several different elements -- best practice for working within the render method is to wrap all of the DOM elements that we want to create in ()
+            //the reason for this is that without the (), if the element is on the next line from the 'return' we will get an error, if there are () even with the staggered line arragement, there will be NO error
+            var Note = React.createClass({
+                //in addition to our simple render method, we can create our own methods inside of our components
+                //here we are going to create an edit function 
+                
+                getInitialState(){
+                    return{editing: false}
+                },
+                edit(){
+                      //alert("Editing Note")
+                      this.setState({editing: true})
+                },
+                save(){
+                    {/* in order to check a UI element's value: use references (in this example, in the var, val referenced in the textarea) */} 
+                    var val = this.refs.newText.value
+                    alert('Later we will save this value: ' + val)
+                    this.setState({editing: false})
+                },
+                remove(){
+                    alert("Removing Note")
+                },
+                renderForm(){
+                    {/* in order to check a UI element's value: use references (in this example, in the textarea) */} 
+                    return(<div className="note">
+                        <textarea ref="newText"></textarea>
+                        <button onClick={this.save}>SAVE</button>
+                    </div>
+                    )
+                },
+                renderDisplay(){
+                    return (
+                        <div className="note">
+                            <p>{this.props.children}</p>
+                            <span>
+                                {/* the onClick function values are within {} denoting JSX syntax */}
+                                <button onClick={this.edit}>EDIT</button>
+                                <button onClick={this.remove}>X</button>
+                            </span>
+                        </div>
+                    )                    
+                },
+                render(){
+                    {/*if(this.state.editing){
+                        return this.renderForm()
+                    }else{
+                        return this.renderDisplay()
+                    } below is an alternative simplified syntax making it more terse and concise -- an inline if-else statement
+                    This is a pretty popular syntax that you'll see, especially in React documentation. A little bit easier to write, and definitely easier to read, so I just wanted to make a little enhancement there. 
+                    */}
+                    return (this.state.editing) ? this.renderForm(): this.renderDisplay() 
+                }
+            })
+            
+            //Creating a board component -- will display a certain number of saved notes -- we will get the values of those notes from properties
+            //Need to make the Board the parent of the Note component
+            var Board = React.createClass({
+                //ERROR CHECKING: 
+                //issue: if we supply a string, or Bool, or a function, we're not going to get the notes rendered correctly 
+                //proptypes: optional built-in utility feature -- documentation for how we expect our components to work and what values you expect for them, but it also provides some nice functionality
+                //proptypes: is going to be set equal to an object, and then you just define your properties inside of the object as different keys
+                //this is going to be set equal to a function that will take in props and prop name 
+                //then we're going to say if type of props prop name is not equal to number, so in other words, if the value for count is supplied as any other type besides a number, we want to throw an error
+                
+                propTypes:{
+                    count: function(props, propName){
+                        if(typeof props[propName] !== "number"){
+                            return new Error("the count must be a number")
+                        }
+                        if(props[propName] > 100){
+                            return new Error('creating ' + props[propName] + ' notes is ridiculous')
+                        }
+                    }
+                },
+                getInitialState(){
+                    return{
+                        notes: [
+                            'Call Bob',
+                            'Email Sara',
+                            'Eat Lunch',
+                            'Finish proposal'
+                        ]
+                    }  
+                },
+                render(){
+                    return(
+                        <div className="board">
+                        {/* instead of using this.props.count, we are going to use a simple map function that's going to map over the notes array, and it's going to display
+                            a note for each item in the array
+                            {this.props.count}
+                            this.state.notes.map is going to map over that array, so we are going to use a simple arrow function
+                            this ES6 arror function is going to take arguments (note and i, which represents the array items) into this first set parentheses, and then it's going to return whatever follows the arrow
+                            
+                            ***** i.e., the map function calls the function for each element in the array (note = array, i = element 
+                            
+                        */}
+                        
+                        {this.state.notes.map((note, i) => {
+                            return <Note key={i}>{note}</Note>
+                        })}
+                            
+                        </div>
+                    )
+                }
+                
+            })
+            
+            //render() takes 2 args, 1st is component we want to render, 2nd where to render the component
+            //count value will be pulled from props
+            ReactDOM.render(<div>
+                <Board count={10} />
+                </div>,
+                document.getElementById('react-container')
+            )
+        </script>
+    </body>
+</html>
+
+
+<!-- JSX: javascript as XML -->
+<!-- error at first < tag -->
+<!-- error corrected via babel: transpiles (compiles) JSX to JS code (JSX, ES6 and beyond) -- which takes JSX and turns it in to createElement calls so browser can read easily 
+
+    ex: <div>Hello World</div> >>> React.createElement('div', null, 'Hello World');
+
+-->
