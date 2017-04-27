@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+        <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+        <title>Component Lifecycle: Updating Components</title>
+        <!-- <style>
+            #myDiv{
+                background-color: blue;
+                height: 200px;
+                width: 200px;
+            }
+        </style> -->
+    </head>
+    <body>
+        <div id="react-container"></div>
+        <!-- this script contains all react content -->
+        <script type="text/babel">
+            var Box = React.createClass({
+                
+                //Get default props will be called once before the component renders to set up defaults for our component
+                //in this method we're actually going to handle all of our styling via getDefaultProps rather than this style tag
+                //So we want to return an object that passes all of this information about our desired style
+                //getDefaultProps provides us a life cycle method for initializing default properties for our components
+                //This isn't a required method, but it is nice to be able to use this in the event that other properties are not passed.
+                getInitialState(){
+                    return{
+                        backgroundColor: 'blue',
+                        height: 200,
+                        width: 200
+                    }
+                },
+
+                //update() handles any changes that occur to the 'myDiv'
+                //The update is going to change the state using this.setState, and here, we will return an object with a 
+                //key of background color, and a background color of red. Every time the update function is called, it's going to set the background color state to red
+                update(){
+                    this.setState({backgroundColor: 'red'})
+                },
+                
+                //componentDidUpdate() is going to fire immediately after a successful re-render, so the change in state will occur, the component will be re-rendered, and then componentDidUpdate() will be called.
+                componentDidUpdate(){
+                    alert('Component did update')
+                },
+
+                render(){
+                    return(
+                        <div id="myDiv">
+                            <div style={this.state} onClick={this.update}></div>
+                        </div>
+                    )
+                }
+            })
+            
+            //render() takes 2 args, 1st is component we want to render, 2nd where to render the component
+            //count value will be pulled from props
+            ReactDOM.render(
+                <div>
+                    <Box />
+                </div>,
+                document.getElementById('react-container')
+            )
+            
+
+            
+        </script>
+    </body>
+</html>
+
+
+<!-- JSX: javascript as XML -->
+<!-- error at first < tag -->
+<!-- error corrected via babel: transpiles (compiles) JSX to JS code (JSX, ES6 and beyond) -- which takes JSX and turns it in to createElement calls so browser can read easily 
+
+    ex: <div>Hello World</div> >>> React.createElement('div', null, 'Hello World');
+
+-->

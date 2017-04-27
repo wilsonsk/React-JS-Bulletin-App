@@ -4,14 +4,14 @@
         <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
         <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
-        <style>
+        <title>Component Lifecycle: Setting Properties</title>
+        <!-- <style>
             #myDiv{
                 background-color: blue;
                 height: 200px;
                 width: 200px;
             }
-        </style>
-        <title>Component Lifecycle</title>
+        </style> -->
     </head>
     <body>
         <div id="react-container"></div>
@@ -19,20 +19,24 @@
         <script type="text/babel">
             var Box = React.createClass({
                 
-                //componentWillMount(): is called right before the render() and it's the last chance to effect state prior to the render
-                componentWillMount(){
-                    alert('Component is about to mount')
+                //Get default props will be called once before the component renders to set up defaults for our component
+                //in this method we're actually going to handle all of our styling via getDefaultProps rather than this style tag
+                //So we want to return an object that passes all of this information about our desired style
+                //getDefaultProps provides us a life cycle method for initializing default properties for our components
+                //This isn't a required method, but it is nice to be able to use this in the event that other properties are not passed.
+                getDefaultProps(){
+                    return{
+                        backgroundColor: 'blue',
+                        height: 200,
+                        width: 200
+                    }
                 },
-                
-                //Component did mount is invoked immediately after initial rendering occurs 
-                componentDidMount(){
-                    alert('Component just mounted')
-                },
-                
+
                 render(){
                     return(
                         <div id="myDiv">
-                        
+                            <div style={this.props}></div>
+                            <section style={this.props}></section>
                         </div>
                     )
                 }
@@ -46,6 +50,9 @@
                 </div>,
                 document.getElementById('react-container')
             )
+            
+
+            
         </script>
     </body>
 </html>

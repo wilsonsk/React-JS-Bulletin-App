@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+        <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+        <style>
+            #myDiv{
+                background-color: blue;
+                height: 200px;
+                width: 200px;
+            }
+        </style>
+        <title>Component Lifecycle</title>
+    </head>
+    <body>
+        <div id="react-container"></div>
+        <!-- this script contains all react content -->
+        <script type="text/babel">
+            var Box = React.createClass({
+                
+                //componentWillMount(): is called right before the render() and it's the last chance to effect state prior to the render
+                componentWillMount(){
+                    alert('Component is about to mount')
+                },
+                
+                //Component did mount is invoked immediately after initial rendering occurs 
+                componentDidMount(){
+                    alert('Component just mounted')
+                },
+                
+                render(){
+                    return(
+                        <div id="myDiv">
+                        
+                        </div>
+                    )
+                }
+            })
+            
+            //render() takes 2 args, 1st is component we want to render, 2nd where to render the component
+            //count value will be pulled from props
+            ReactDOM.render(
+                <div>
+                    <Box />
+                </div>,
+                document.getElementById('react-container')
+            )
+            
+            //this function is going to use React DOM.unmountComponentAtNode()
+            //Here, we want to reference the component that's the parent of my div. In this case, it would be the React container
+            var myBox = document.getElementById('myDiv')
+            myBox.onclick = function(){
+                ReactDOM.unmountComponentAtNode(document.getElementById('react-container'))
+                alert('Component unmounted')
+            }
+            
+        </script>
+    </body>
+</html>
+
+
+<!-- JSX: javascript as XML -->
+<!-- error at first < tag -->
+<!-- error corrected via babel: transpiles (compiles) JSX to JS code (JSX, ES6 and beyond) -- which takes JSX and turns it in to createElement calls so browser can read easily 
+
+    ex: <div>Hello World</div> >>> React.createElement('div', null, 'Hello World');
+
+-->

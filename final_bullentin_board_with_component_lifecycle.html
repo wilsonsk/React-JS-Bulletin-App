@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!-- 
+    the component life cycle can make a lot of great enhancements to our code. We can do things like load data. We can add a little enhancements to our form fields. 
+    Any time we need to do any sort of data loading or optimizations for speed, we can always tap into those component life cycle methods to make our applications even better.
+-->
+<html>
+    <head>
+        <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+        <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.js"></script>
+        <!-- ReactDraggable allows you to wrap a component in another component called Draggable. And that's going to allow you to drag these notes around the page -->
+        <Script src="https://npmcdn.com/react-draggable"></Script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <title>Building the Note Board</title>
+    </head>
+    <body>
+        <div id="react-container"></div>
+        <!-- this script contains all react content -->
+        <script type="text/babel">
+            //create component for Note
+            //in this case we are going to return several different elements -- best practice for working within the render method is to wrap all of the DOM elements that we want to create in ()
+            //the reason for this is that without the (), if the element is on the next line from the 'return' we will get an error, if there are () even with the staggered line arragement, there will be NO error
+            var Note = React.createClass({
+                //in addition to our simple render method, we can create our own methods inside of our components
+                //here we are going to create an edit function 
+                
+                getInitialState(){
+                    return{editing: false}
+                },
+                
+                //componentWillMount will execute right before the render
+                //componentWillMount is going to set up a style on the new note using the randomBetween()
+                //we've made use of the component will mount method to add this right before our DOM elements are rendered
+                
+                componentWillMount(){
+                    this.style = {
+                        right: this.randomBetween(0, window.innerWidth - 150, 'px'),
+                        top: this.randomBetween(0, window.innerHeight - 150, 'px')
+                    }
+                },
+                
+                componentDidUpdate(){
+                    if(this.state.editing){
+                        this.refs.newText.focus()
+                        this.refs.newText.select()
+                    }
+                },
+                
+                //shouldComponentUpdate(): invoked right before rendering and are often used for optimization -- only going to call these methods if something has changed 
+                //don't want note to re-render if the text msg has not changed
+                shouldComponentUpdate(nextProps, nextState){
+                    return this.props.children !== nextProps.children || this.state !== nextState
+                },
+                
+                //We are going to make special use of this key property by using a random function within our component. Random between is going to take in X, Y, and S. X is the X axis, Y is the Y, and S is the units. 
+                //The random between method is going to be in charge of generating a random number between certain numbers. We're going to say X plus math dot ceil, and then inside of math dot ceil, we use math dot random.
+                //Math dot random is going to generate a random number between zero and one. Then, we're going to subtract X from Y, making this a number somewhere there on our screen
+                //Then, at the end here, we're going to add on S for our units.
+                
+                randomBetween(x, y, s){
+                    return(x + Math.ceil(Math.random() * (y-x))) + s
+                },
+                edit(){
+                      //alert("Editing Note")
+                      this.setState({editing: true})
+                },
+                save(){
+                    {/* in order to check a UI element's value: use references (in this example, in the var, val referenced in the textarea) */} 
+                    this.props.onChange(this.refs.newText.value, this.props.id)
+                    this.setState({editing: false})
+                },
+                remove(){
+                    this.props.onRemove(this.props.id)
+                },
+                renderForm(){
+                    {/* in order to check a UI element's value: use references (in this example, in the textarea) */} 
+                    return(<div className="note" style={this.style}>
+                        <textarea ref="newText" defaultValue={this.props.children}></textarea>
+                        <button onClick={this.save}>SAVE</button>
+                    </div>
+                    )
+                },
+                renderDisplay(){
+                    return (
+                        <div className="note" style={this.style}>
+                            <p>{this.props.children}</p>
+                            <span>
+                                {/* the onClick function values are within {} denoting JSX syntax */}
+                                <button onClick={this.edit}>EDIT</button>
+                                <button onClick={this.remove}>X</button>
+                            </span>
+                        </div>
+                    )                    
+                },
+                render(){
+                    {/*if(this.state.editing){
+                        return this.renderForm()
+                    }else{
+                        return this.renderDisplay()
+                    } below is an alternative simplified syntax making it more terse and concise -- an inline if-else statement
+                    This is a pretty popular syntax that you'll see, especially in React documentation. A little bit easier to write, and definitely easier to read, so I just wanted to make a little enhancement there. 
+                    */}
+                    {/* 
+                        wrap return statement in ReactDraggable -- first wrap statement in new set of ()
+                    */}
+                    return (<ReactDraggable>
+                        {(this.state.editing) ? this.renderForm(): this.renderDisplay()}
+                        </ReactDraggable>
+                    )
+                }
+            })
+            
+            //Creating a board component -- will display a certain number of saved notes -- we will get the values of those notes from properties
+            //Need to make the Board the parent of the Note component
+            var Board = React.createClass({
+                //ERROR CHECKING: 
+                //issue: if we supply a string, or Bool, or a function, we're not going to get the notes rendered correctly 
+                //proptypes: optional built-in utility feature -- documentation for how we expect our components to work and what values you expect for them, but it also provides some nice functionality
+                //proptypes: is going to be set equal to an object, and then you just define your properties inside of the object as different keys
+                //this is going to be set equal to a function that will take in props and prop name 
+                //then we're going to say if type of props prop name is not equal to number, so in other words, if the value for count is supplied as any other type besides a number, we want to throw an error
+                
+                propTypes:{
+                    count: function(props, propName){
+                        if(typeof props[propName] !== "number"){
+                            return new Error("the count must be a number")
+                        }
+                        if(props[propName] > 100){
+                            return new Error('creating ' + props[propName] + ' notes is ridiculous')
+                        }
+                    }
+                },
+                getInitialState(){
+                    return{
+                        //{/* change the notes array items to objects with key, id and key, note*/}
+                        notes: []
+                    }  
+                },
+                
+                //So we have used the fetch api and we have used all these .then() to do the things we want to do after this data loads
+                componentWillMount(){
+                    if(this.props.count){
+                        var url = `http://baconipsum.com/api/?type=all-meat&sentences=${this.props.count}`
+                        fetch(url)
+                            .then(results => results.json())
+                            .then(array => array[0])
+                            .then(text => text.split('. '))
+                            .then(array => array.forEach(sentence => this.add(sentence)))
+                            .catch(function(err){
+                                console.log("Didn't connect to API")
+                            })
+                    }      
+                },
+                
+                nextId(){
+                    //handles incrementing our IDs and we can attach this to our ID here using this.nextIs and then calling that function 
+                    this.uniqueId = this.uniqueId || 0
+                    return this.uniqueId++
+                },
+                add(text){
+                    //spread operator is going to take whatever is in the state of notes, where that's one note or a hundred notes, and it's going to make those the first items in the array
+                    //then we are going to add on this new item in the array, an object with an ID and note
+                    var notes = [
+                        ...this.state.notes, 
+                        {
+                            id: this.nextId(),
+                            note: text
+                        }
+                    ]
+                    this.setState({notes})
+                },
+                //create an update() that is going to handle the editing of notes -- has 2 parameters
+                //this will set our notes in state and then map over those and depending on whether or not this note should be updated we're going to use this little callback function here
+                //using an ES6 arrow function, takes notes arg and it's going to check to see if the id of the note being edited is the note, if not, we're going to return the note
+                //otherwise we're going to return a new object -- and the new object is going to push whatever keys are in the note already into that note using the spread operator -- ie., keep id as is but push new text into the key's value (note)
+                //The spread syntax allows an expression to be expanded in places where multiple arguments (for function calls) 
+                //or multiple elements (for array literals) or multiple variables  (for destructuring assignment) are expected.
+                update(newText, id){
+                    var notes = this.state.notes.map(note => (note.id !== id) ? note : {...note, note: newText})
+                    //{/* setState() pushes all of our new notes into that */}
+                    this.setState({notes})
+                },
+                //array.filter(): is a method that's just part of regular JS -- it's going to make a copy of the notes array and it will only return the items when the logical test is passed 
+                //we will use a callback function here -- it takes in note and then we're going to check to see that the note id is not equal to the id
+                remove(id){
+                    var notes = this.state.notes.filter(note => note.id !== id)
+                    this.setState({notes})
+                },
+                eachNote(note){
+                    return (<Note key={note.id} id={note.id} onChange={this.update} onRemove={this.remove}>{note.note}</Note>)
+                },
+                render(){
+                    return(
+                        <div className="board">
+                        {/* instead of using this.props.count, we are going to use a simple map function that's going to map over the notes array, and it's going to display
+                            a note for each item in the array
+                            {this.props.count}
+                            this.state.notes.map is going to map over that array, so we are going to use a simple arrow function
+                            this ES6 arror function is going to take arguments (note and i, which represents the array items) into this first set parentheses, and then it's going to return whatever follows the arrow
+                            
+                            ***** i.e., the map function calls the function for each element in the array (note = array, i = element 
+                            
+                        */}
+                        
+                            {this.state.notes.map(this.eachNote)}
+                            <button onClick={() => this.add()}>+ NEW NOTE</button>
+                        </div>
+                    )
+                }
+            })
+            
+            //render() takes 2 args, 1st is component we want to render, 2nd where to render the component
+            //count value will be pulled from props
+            ReactDOM.render(<div>
+                <Board count={10} />
+                </div>,
+                document.getElementById('react-container')
+            )
+        </script>
+    </body>
+</html>
+
+
+<!-- JSX: javascript as XML -->
+<!-- error at first < tag -->
+<!-- error corrected via babel: transpiles (compiles) JSX to JS code (JSX, ES6 and beyond) -- which takes JSX and turns it in to createElement calls so browser can read easily 
+
+    ex: <div>Hello World</div> >>> React.createElement('div', null, 'Hello World');
+
+-->
