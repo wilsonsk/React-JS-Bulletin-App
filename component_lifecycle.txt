@@ -8,6 +8,8 @@ Component Lifecycle:
             - componentWillMount(): is called right before the render() and it's the last chance to effect state prior to the render 
             - render(): is the only required method
             - componentDidMount(): executes right after the render
+                - We usually also do any ajax fetching here in componentDidMount so that when it comes back from the server we are sure that we have DOM to modify with data. 
+                - We also usually fire any timers in here or any listeners to other events 
             - so after a successful render, we can now access the DOM, the component has been rendered and now the user can interact with it
             
     - Updating Lifecycle: (lifetime)
@@ -21,5 +23,11 @@ Component Lifecycle:
         - is called right before the component is unmounted 
         - this can help do things like clean up the DOM elements and invalidate timers
         - so when the componentWillUnmount() is called on the parent, all of the children are unmounted as well
+        - in componentWillUnmount we usually clean those timers and listeners so that they don't leak out of the scope of a component.
         
     - the component lifecycle has many different methods that you can use to optimize your applications
+    
+    - Virtual DOM:
+    - So React.createElement h2 is going to give us a simple object. This object has many properties, but the most important properties are the type of the object, which is an h2, 
+        - and the props property, which has a children property that holds the text that we just rendered. So with React, we simply describe HTML elements as objects, and then React put them together into a tree.
+        - And it keeps a copy of this tree in memory, so when things change, React will recalculate the tree, and actually compare trees.
